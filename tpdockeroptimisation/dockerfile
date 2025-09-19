@@ -1,4 +1,4 @@
-# Step 2 : image alpine + suppression paquets inutiles
+# Step 3 : sécurité et finalisation
 FROM node:20-alpine
 
 WORKDIR /app
@@ -18,7 +18,7 @@ EXPOSE 3000
 # Définir environnement production
 ENV NODE_ENV=production
 
-# Utiliser un utilisateur non-root par défaut
+# Sécurité : utiliser un utilisateur non-root
 USER node
 
 # Commande de démarrage
