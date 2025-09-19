@@ -1,0 +1,9 @@
+# Ne pas copier les dépendances locales
+node_modules
+
+# Dossiers et fichiers temporaires
+logs
+.DS_Store
+
+# Git
+.git

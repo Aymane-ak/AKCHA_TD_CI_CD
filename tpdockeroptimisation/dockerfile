@@ -1,0 +1,35 @@
+# Step 4 : Optimisation avec multi-stage build
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copier package.json et package-lock.json pour cache
+COPY package*.json ./
+
+# Installer toutes les dépendances (dev + prod)
+RUN npm ci
+
+# Copier le reste de l’application
+COPY . .
+
+# Builder terminé
+FROM node:20-alpine AS runtime
+
+WORKDIR /app
+
+# Copier uniquement les fichiers nécessaires de builder
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/server.js ./
+
+# Exposer le port principal
+EXPOSE 3000
+
+# Définir l’environnement en production
+ENV NODE_ENV=production
+
+# Sécurité : utiliser un utilisateur non-root
+USER node
+
+# Commande de démarrage
+CMD ["node", "server.js"]
