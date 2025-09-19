@@ -1,24 +1,24 @@
-# Step 1 : cache et dépendances
-FROM node:18-slim
+# Step 2 : image alpine + suppression paquets inutiles
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copier uniquement package.json et package-lock.json pour tirer parti du cache
+# Copier uniquement package*.json pour le cache
 COPY package*.json ./
 
-# Installer uniquement les dépendances de production
+# Installer uniquement dépendances de production
 RUN npm ci --omit=dev
 
 # Copier le reste de l’application
 COPY . .
 
-# Exposer le port principal
+# Exposer uniquement le port principal
 EXPOSE 3000
 
-# Définir l'environnement de production
+# Définir environnement production
 ENV NODE_ENV=production
 
-# Utiliser l'utilisateur non-root fourni par l'image
+# Utiliser un utilisateur non-root par défaut
 USER node
 
 # Commande de démarrage
