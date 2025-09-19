@@ -1,21 +1,31 @@
-# Step 3 : sécurité et finalisation
-FROM node:20-alpine
+# Step 4 : Optimisation avec multi-stage build
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copier uniquement package*.json pour le cache
+# Copier package.json et package-lock.json pour cache
 COPY package*.json ./
 
-# Installer uniquement dépendances de production
-RUN npm ci --omit=dev
+# Installer toutes les dépendances (dev + prod)
+RUN npm ci
 
 # Copier le reste de l’application
 COPY . .
 
-# Exposer uniquement le port principal
+# Builder terminé
+FROM node:20-alpine AS runtime
+
+WORKDIR /app
+
+# Copier uniquement les fichiers nécessaires de builder
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/server.js ./
+
+# Exposer le port principal
 EXPOSE 3000
 
-# Définir environnement production
+# Définir l’environnement en production
 ENV NODE_ENV=production
 
 # Sécurité : utiliser un utilisateur non-root
